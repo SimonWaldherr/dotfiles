@@ -18,9 +18,14 @@ alias lr='ls -R | grep ":$" | sed -e '\''s/:$//'\'' -e '\''s/[^-][^\/]*\//--/g'\
 alias sudolast='sudo !!'
 alias swift='xcrun swift'
 alias elasticsearchx='elasticsearch --config=/usr/local/opt/elasticsearch/config/elasticsearch.yml'
+alias sbc='compgen -A function -abck | grep'
 
 dash () {
   open dash://$1
+}
+
+hgrep () {
+  history | grep "$1"
 }
 
 savebashprofile () {
@@ -34,7 +39,7 @@ savebashprofile () {
   ls -al /usr/bin/ >> ~/git/archive/bin.log
   rls ~/Golang/src 3 ld > ~/git/archive/gosrc.log
   history | cut -c 8- | grep "go get " > ~/git/archive/goget.log
-  #npm ll -g shows more info about installed node packages
+  npm ll -g > ~/git/archive/npmll.log
 }
 
 rls () {
@@ -114,6 +119,7 @@ autocompile () {
       *.c)      compilec $1 ;;
       *.java)   compilejava $1 ;;
       *.nim)    /usr/local/Cellar/nimrod/0.9.2/libexec/bin/nimrod compile --run $1 ;;
+      *.rs)	    rustc $1 ;;
       *)        echo "'$1' cannot be run via autocompile()" ;;
     esac
   else
@@ -229,7 +235,7 @@ if [ -f $(brew --prefix)/etc/bash_completion ]; then
 fi
 
 export GOPATH="~/Golang/"
-export PATH=$PATH:/usr/local/opt/go/libexec/bin
+export PATH=$PATH:/usr/local/opt/go/libexec/bin:$GOPATH/bin
 export CLICOLOR=1
 export LSCOLORS=dxfxcxdxbxegedabagacad
 export HISTSIZE=900000
@@ -237,6 +243,7 @@ export PATH=/usr/local/bin:$PATH
 export HISTCONTROL="ignoreboth"
 export LS_OPTIONS='--color=auto'
 export NVM_DIR=~/.nvm
+export DYLD_LIBRARY_PATH=$PWD/libgit2/install/lib
 
 shopt -s histappend
 source "`brew --prefix`/etc/grc.bashrc"
@@ -265,3 +272,4 @@ if [ "$TERM" != "dumb" ]; then
     export LS_OPTIONS='--color=auto'
     eval `gdircolors ~/.dir_colors`
 fi
+export PATH=/usr/local/sbin:$PATH
