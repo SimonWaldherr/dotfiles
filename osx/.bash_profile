@@ -4,7 +4,6 @@ alias cddesktop='cd ~/Desktop/'
 alias cddownload='cd ~/Downloads/'
 alias cdgit='cd ~/git/'
 alias editprofile='nano ~/.bash_profile'                                # edit bash profile
-alias update="sudo softwareupdate -i -a; brew update; brew upgrade"     # update mac and homebrew
 alias now='date +"%d.%m.%Y %T"'                                         # print now as dd.mm.yyyy hh:mm:ss
 alias fping='ping -c 20 -i 0.1 -s 2048'                                 # make 20 pings with 2048 bytes
 alias myip='curl ip.appspot.com'                                        # Public facing IP Address
@@ -19,9 +18,49 @@ alias sudolast='sudo !!'
 alias swift='xcrun swift'
 alias elasticsearchx='elasticsearch --config=/usr/local/opt/elasticsearch/config/elasticsearch.yml'
 alias sbc='compgen -A function -abck | grep'
+alias int='netstat -i'
+alias gg='go get -u'
+alias arptsv='sudo arp-scan -l | grep "\t"'
+alias follow='tail -f'
+alias snnmap='sudo nmap -sn'
+alias makemine='sudo chown simonwaldherr'
+alias sbooton='sudo nvram boot-args="-x -v"'
+alias sbootoff='sudo nvram boot-args=""'
+alias sbootverbose='sudo nvram boot-args="-v"'
+
+supdate () {
+  softwareupdate -i -a &
+  bgp1=$!
+  brew update && brew upgrade &
+  bgp2=$!
+  wait $bgp1
+  wait $bgp2
+}
+
+ccc () {
+  compname=`echo "$1" | sed 's/\(.*\)\..*/\1/'`
+  clangname="_clang"
+  clangname=$compname$clangname
+  gccname="_gcc"
+  gccname=$compname$gccname
+  clang $1 -o $clangname
+  gcc $1 -DG=1 -DP=4 -DV=8 -D_BSD_SOURCE -o $gccname -lm
+}
+
+jssize () {
+  uglifyjs $1 | gzip -9f | wc -c
+}
 
 dash () {
   open dash://$1
+}
+
+word () {
+  grep '\$1\>' /usr/share/dict/words
+}
+
+sman () {
+  man -k "$1" | tail -n +0
 }
 
 hgrep () {
@@ -29,17 +68,20 @@ hgrep () {
 }
 
 savebashprofile () {
-  cp ~/.bash_profile ~/git/archive/bash_profile.log
-  brew list --versions > ~/git/archive/brew_list.log
-  ls -al /Applications/ > ~/git/archive/applications.log
-  pkgutil --packages > ~/git/archive/pkgutil.log
-  history > ~/git/archive/history.log
-  npm list -g > ~/git/archive/npm_list.log
-  ls -al /usr/local/bin/ > ~/git/archive/bin.log
-  ls -al /usr/bin/ >> ~/git/archive/bin.log
-  rls ~/Golang/src 3 ld > ~/git/archive/gosrc.log
-  history | cut -c 8- | grep "go get " > ~/git/archive/goget.log
-  npm ll -g > ~/git/archive/npmll.log
+  time php ~/git/Todo/osx_settings/sqlquery.php &
+  bgp=$!
+  cp ~/.bash_profile ~/git/Todo/osx_settings/bash_profile.log
+  brew list --versions > ~/git/Todo/osx_settings/brew_list.log
+  ls -al /Applications/ > ~/git/Todo/osx_settings/applications.log
+  pkgutil --packages > ~/git/Todo/osx_settings/pkgutil.log
+  history > ~/git/Todo/osx_settings/history.log
+  npm list -g > ~/git/Todo/osx_settings/npm_list.log
+  ls -al /usr/local/bin/ > ~/git/Todo/osx_settings/bin.log
+  ls -al /usr/bin/ >> ~/git/Todo/osx_settings/bin.log
+  rls ~/Golang/src 3 ld > ~/git/Todo/osx_settings/gosrc.log
+  history | cut -c 8- | grep "go get " > ~/git/Todo/osx_settings/goget.log
+  history | cut -c 8- | grep "gg github" >> ~/git/Todo/osx_settings/goget.log
+  wait $bgp
 }
 
 rls () {
@@ -119,7 +161,7 @@ autocompile () {
       *.c)      compilec $1 ;;
       *.java)   compilejava $1 ;;
       *.nim)    /usr/local/Cellar/nimrod/0.9.2/libexec/bin/nimrod compile --run $1 ;;
-      *.rs)	    rustc $1 ;;
+      *.rs)	rustc $1 ;;
       *)        echo "'$1' cannot be run via autocompile()" ;;
     esac
   else
@@ -220,11 +262,13 @@ ii() {
   echo -e "\nYou are logged on ${RED}$HOST"
   echo -e "\nAdditionnal information:$NC " ; uname -a
   echo -e "\n${RED}Users logged on:$NC " ; w -h
-  echo -e "\n${RED}Current date :$NC " ; date
-  echo -e "\n${RED}Machine stats :$NC " ; uptime
-  echo -e "\n${RED}Current network location :$NC " ; scselect
-  echo -e "\n${RED}Public facing IP Address :$NC " ;myip
+  echo -e "\n${RED}Current date:$NC " ; date
+  echo -e "\n${RED}Machine stats:$NC " ; uptime
+  echo -e "\n${RED}Current network location:$NC " ; scselect
+  echo -e "\n${RED}Public facing IP Address:$NC " ; myip
   #echo -e "\n${RED}DNS Configuration:$NC " ; scutil --dns
+  echo -e "\n${RED}CONNECTIONS:$NC " ; netstat | grep "ESTABLISHED"
+  echo -e "\n${RED}ARP:$NC " ; arp -ax
   echo
 }
 
@@ -234,7 +278,7 @@ if [ -f $(brew --prefix)/etc/bash_completion ]; then
   . $(brew --prefix)/etc/bash_completion
 fi
 
-export GOPATH="~/Golang/"
+export GOPATH="/Users/simonwaldherr/Golang"
 export PATH=$PATH:/usr/local/opt/go/libexec/bin:$GOPATH/bin
 export CLICOLOR=1
 export LSCOLORS=dxfxcxdxbxegedabagacad
