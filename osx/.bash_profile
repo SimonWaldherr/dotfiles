@@ -40,9 +40,10 @@ alias fgrep='fgrep --color=auto'
 alias sha1='openssl sha1'
 alias path='echo -e ${PATH//:/\\n}'
 alias header='curl -I'
+alias apps='echo $PATH | tr ":" "\n" | xargs ls | grep'
 
 mostused () {
-  cat ~/git/Todo/osx_settings/history.log | sed "s/\| */| 1  /g" | tr "|" "\n" | awk '{CMD[$2]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl |  head -n25
+  cat ~/git/Todo/osx_settings/history.log | tr "|" "\n" | awk '{CMD[$1]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl |  head -n25
 }
 
 hgrep () { 
@@ -112,15 +113,17 @@ savebashprofile () {
   rm /Applications/.DS_Store
   ls -al /Applications/ > ~/git/Todo/osx_settings/applications.log
   pkgutil --packages > ~/git/Todo/osx_settings/pkgutil.log
-  history > ~/git/Todo/osx_settings/history.log
+  history >> ~/git/Todo/osx_settings/history.log
+  cat ~/git/Todo/osx_settings/history.log | sed -e 's/^[0-9 \t]*//' | awk '!a[$0]++' > ~/git/Todo/osx_settings/history.log.tmp
+  mv ~/git/Todo/osx_settings/history.log.tmp ~/git/Todo/osx_settings/history.log
   npm list -g > ~/git/Todo/osx_settings/npm_list.log
   ls -al /usr/local/bin/ > ~/git/Todo/osx_settings/bin.log
   ls -al /usr/bin/ >> ~/git/Todo/osx_settings/bin.log
   ls -al /Users/simonwaldherr/Golang/bin >> ~/git/Todo/osx_settings/bin.log
   ls -al /Users/simonwaldherr/git/GOLANG/bin >> ~/git/Todo/osx_settings/bin.log
   rls ~/Golang/src 3 ld > ~/git/Todo/osx_settings/gosrc.log
-  history | cut -c 8- | grep "go get " > ~/git/Todo/osx_settings/goget.log
-  history | cut -c 8- | grep "gg github" >> ~/git/Todo/osx_settings/goget.log
+  cat ~/git/Todo/osx_settings/history.log | grep "go get " > ~/git/Todo/osx_settings/goget.log
+  cat ~/git/Todo/osx_settings/history.log | grep "gg " >> ~/git/Todo/osx_settings/goget.log
   alias > ~/git/Todo/osx_settings/alias.log
   wait $bgp
 }
