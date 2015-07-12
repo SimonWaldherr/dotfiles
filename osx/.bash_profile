@@ -1,92 +1,128 @@
 #.bash_profile
 
+alias ..='cd ..'
+alias ...='cd ../../../'
+alias ....='cd ../../../../'
+alias .....='cd ../../../../'
+alias apps='echo $PATH | tr ":" "\n" | xargs ls'
+alias arptsv='sudo arp-scan -l | grep "\t"'
+alias as='colourify as'
+alias bu='brew update && brew upgrade --all && brew cleanup'
+alias cd..='cd ..'
 alias cddesktop='cd ~/Desktop/'
 alias cddownload='cd ~/Downloads/'
 alias cdgit='cd ~/git/'
-alias editprofile='nano ~/.bash_profile'                                # edit bash profile
-alias now='date +"%d.%m.%Y %T"'                                         # print now as dd.mm.yyyy hh:mm:ss
-alias fping='ping -c 20 -i 0.1 -s 2048'                                 # make 20 pings with 2048 bytes
-alias myip='curl ip.appspot.com'                                        # Public facing IP Address
-alias netCons='lsof -i'                                                 # Show all open TCP/IP sockets
-alias flushDNS='dscacheutil -flushcache'                                # Flush out the DNS Cache
-alias openPorts='sudo lsof -i | grep LISTEN'                            # All listening connections
-alias localip="ifconfig en0 inet | grep 'inet ' | awk ' { print $2 } '" # show local ip address
+alias colourify='/usr/local/bin/grc -es --colour=auto'
+alias df='colourify df'
+alias diff='colourify diff'
+alias dig='colourify dig'
+alias dus='df -h'
+alias editprofile='vi ~/.bash_profile'
+alias egrep='egrep --color=auto'
+alias elasticsearchx='elasticsearch --config=/usr/local/opt/elasticsearch/config/elasticsearch.yml'
+alias fgrep='fgrep --color=auto'
 alias finder_s='defaults write com.apple.Finder AppleShowAllFiles TRUE; killAll Finder'
+alias flushDNS='dscacheutil -flushcache'
+alias follow='tail -f'
+alias fping='ping -c 20 -i 0.1 -s 2048'
+alias g++='colourify g++'
+alias gas='colourify gas'
+alias gcc='colourify gcc'
+alias get='wget -q -O-'
+alias gg='go get -u'
+alias godev='~/git/GOLANG/bin/go'
+alias godevfmt='~/git/GOLANG/bin/gofmt'
+alias grep='grep --color=auto'
+alias head='colourify head'
+alias header='curl -I'
+alias int='netstat -i'
+alias kvml='source /usr/local/bin/kvm.sh'
+alias l.='ls -d .* --color=auto'
+alias ld='colourify ld'
+alias ll='ls -al'
+alias localip='ifconfig en0 inet | grep '\''inet '\'' | awk '\'' { print  } '\'''
 alias lr='ls -R | grep ":$" | sed -e '\''s/:$//'\'' -e '\''s/[^-][^\/]*\//--/g'\'' -e '\''s/^/   /'\'' -e '\''s/-/|/'\'' | less'
+alias make='colourify make'
+alias makemine='sudo chown simonwaldherr'
+alias mount='colourify mount'
+alias mtr='colourify mtr'
+alias myip='curl ip.appspot.com'
+alias netCons='lsof -i'
+alias netstat='colourify netstat'
+alias now='date +"%d.%m.%Y %T"'
+alias openPorts='sudo lsof -i | grep LISTEN'
+alias path='echo -e ${PATH//:/\\n}'
+alias ping='colourify ping'
+alias ps='colourify ps'
+alias psroot='ps aux|grep "root"'
+alias psme='ps aux|grep $(whoami)'
+alias rwget='wget -rkpN -e robots=off --no-parent'
+alias sbc='compgen -A function -abck | grep'
+alias sbootoff='sudo nvram boot-args=""'
+alias sbooton='sudo nvram boot-args="-x -v"'
+alias sbootverbose='sudo nvram boot-args="-v"'
+alias sha1='openssl sha1'
+alias snnmap='sudo nmap -sn'
 alias sudolast='sudo !!'
 alias swift='xcrun swift'
-alias elasticsearchx='elasticsearch --config=/usr/local/opt/elasticsearch/config/elasticsearch.yml'
-alias sbc='compgen -A function -abck | grep'
-alias int='netstat -i'
-alias gg='go get -u'
-alias arptsv='sudo arp-scan -l | grep "\t"'
-alias follow='tail -f'
-alias snnmap='sudo nmap -sn'
-alias makemine='sudo chown simonwaldherr'
-alias sbooton='sudo nvram boot-args="-x -v"'
-alias sbootoff='sudo nvram boot-args=""'
-alias sbootverbose='sudo nvram boot-args="-v"'
-alias godev='/Users/simonwaldherr/git/GOLANG/bin/go'
-alias godevfmt='/Users/simonwaldherr/git/GOLANG/bin/gofmt'
-alias bu='brew update && brew upgrade --all && brew cleanup'
-alias get='wget -q -O-'
-alias rwget='wget -rkpN -e robots=off --no-parent'
-alias psroot='ps aux|grep "root"'
-alias pssimonwaldherr='ps aux|grep "simonwaldherr"'
-alias trim="sed -e 's/^[[:space:]]*//g' -e 's/[[:space:]]*\$//g'"
-alias grep='grep --color=auto'
-alias egrep='egrep --color=auto'
-alias fgrep='fgrep --color=auto'
-alias sha1='openssl sha1'
-alias path='echo -e ${PATH//:/\\n}'
-alias header='curl -I'
-alias apps='echo $PATH | tr ":" "\n" | xargs ls | grep'
+alias tail='colourify tail'
+alias traceroute='colourify /usr/sbin/traceroute'
+alias trim='sed -e '\''s/^[[:space:]]*//g'\'' -e '\''s/[[:space:]]*$//g'\'''
+alias x='exit'
+alias pe='path-extractor'
+
+appsdupp () {
+  apps | awk '{CMD[$1]++;count++;}END { for (a in CMD)print CMD[a] " " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl | grep -v "1   "
+}
 
 mostused () {
-  cat ~/git/Todo/osx_settings/history.log | tr "|" "\n" | awk '{CMD[$1]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl |  head -n25
+  history | sed 's/bu/brew update/' | sed 's/hgrep/history|grep/' | sed 's/godev/go/' | sed 's/rls/find/' | sed 's/gg/go get/' | sed 's/^ +//' | tr "|" "\n" | awk '{CMD[$1]++;count++;}END { for (a in CMD)print CMD[a] " " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl |  head -n50
 }
 
 hgrep () { 
-  history | grep "$1" 
+  history | tail -r | sed -e 's/^[0-9 \t]*//' | awk '!a[$0]++' | tail -r | grep "$1" 
 }
-hhgrep () { 
-  cat /Volumes/Macintosh\ HD/Users/simonwaldherr/git/Todo/osx_settings/history.log | grep "$1" 
-}
+
 mkacd () { 
   mkdir "$1"; cd "$1" 
 }
+
 wgetgrep () { 
   wget -q -O- "$1" | grep "$2" 
 }
+
 sman () { 
   man -k "$1" | tail -n +0 
 }
+
 jssize () { 
   uglifyjs "$1" | gzip -9f | wc -c 
 }
+
 dash () { 
   open dash://$1 
 }
+
 word () { 
   grep '\$1\>' /usr/share/dict/words 
 }
+
 searchwithline () { 
   cat -n $1 | grep "$2" 
 }
+
 scraper () { 
   for i in $(wget -q -O- "$1" | tr "(" "\n" | tr "<" "\n" | tr ">" "\n" | tr " " "\n" | tr "\"" "\n" | tr "?" "\n" | grep "http" | grep "\.$2" | sed -E "s/.+http([^\)>]+)\.$2\.*/http\1.$2/" | grep "http" | awk '!a[$0]++') ; do wget -bq $i && echo $i ; done 
 }
+
 pman () { 
   man "$1" -t | open -f -a Preview 
 }
 
-
-source /usr/local/bin/kvm.sh
-
 supdate () {
   softwareupdate -i -a &
   bgp1=$!
-  brew update && brew upgrade --all && brew cleanup &
+  bu &
   bgp2=$!
   wait $bgp1
   wait $bgp2
@@ -103,29 +139,26 @@ ccc () {
 }
 
 savebashprofile () {
-  mostused > ~/git/Todo/osx_settings/mostused.log
-  cp ~/Library/Application\ Support/PremiumSoft\ CyberTech/Navicat\ Premium/QueryExec.log ~/git/Todo/osx_settings/sqlquery.log
-  time php ~/git/Todo/osx_settings/sqlquery.php &
-  bgp=$!
-  cp /Users/simonwaldherr/.vimrc ~/git/Todo/osx_settings/vimrc.log
+  cp ~/.vimrc ~/git/Todo/osx_settings/vimrc.log
   cp ~/.bash_profile ~/git/Todo/osx_settings/bash_profile.log
   brew list --versions > ~/git/Todo/osx_settings/brew_list.log
   rm /Applications/.DS_Store
   ls -al /Applications/ > ~/git/Todo/osx_settings/applications.log
   pkgutil --packages > ~/git/Todo/osx_settings/pkgutil.log
   history >> ~/git/Todo/osx_settings/history.log
-  cat ~/git/Todo/osx_settings/history.log | sed -e 's/^[0-9 \t]*//' | awk '!a[$0]++' > ~/git/Todo/osx_settings/history.log.tmp
+  cat ~/git/Todo/osx_settings/history.log | tail -r | sed -e 's/^[0-9 \t]*//' | awk '!a[$0]++' | tail -r > ~/git/Todo/osx_settings/history.log.tmp
   mv ~/git/Todo/osx_settings/history.log.tmp ~/git/Todo/osx_settings/history.log
   npm list -g > ~/git/Todo/osx_settings/npm_list.log
   ls -al /usr/local/bin/ > ~/git/Todo/osx_settings/bin.log
   ls -al /usr/bin/ >> ~/git/Todo/osx_settings/bin.log
-  ls -al /Users/simonwaldherr/Golang/bin >> ~/git/Todo/osx_settings/bin.log
-  ls -al /Users/simonwaldherr/git/GOLANG/bin >> ~/git/Todo/osx_settings/bin.log
+  ls -al ~/Golang/bin >> ~/git/Todo/osx_settings/bin.log
+  ls -al ~/git/GOLANG/bin >> ~/git/Todo/osx_settings/bin.log
   rls ~/Golang/src 3 ld > ~/git/Todo/osx_settings/gosrc.log
   cat ~/git/Todo/osx_settings/history.log | grep "go get " > ~/git/Todo/osx_settings/goget.log
   cat ~/git/Todo/osx_settings/history.log | grep "gg " >> ~/git/Todo/osx_settings/goget.log
+  mostused > ~/git/Todo/osx_settings/mostused.log
+  apps > ~/git/Todo/osx_settings/apps.log
   alias > ~/git/Todo/osx_settings/alias.log
-  wait $bgp
 }
 
 rls () {
@@ -270,7 +303,7 @@ compilejava () {
   do
     mv -f "$4"/java-compiled/$file "$file"
   done
-  
+
   # If javac only produced 1 file, output the name of that file without extension
   count=`echo "$files" | wc -l`
   if [ $count -eq 1 ]
