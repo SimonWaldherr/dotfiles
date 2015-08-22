@@ -1,9 +1,7 @@
 #.bash_profile
 
 alias ..='cd ..'
-alias ...='cd ../../../'
-alias ....='cd ../../../../'
-alias .....='cd ../../../../'
+alias apt-get='brew'
 alias apps='echo $PATH | tr ":" "\n" | xargs ls'
 alias arptsv='sudo arp-scan -l | grep "\t"'
 alias as='colourify as'
@@ -13,13 +11,14 @@ alias cddesktop='cd ~/Desktop/'
 alias cddownload='cd ~/Downloads/'
 alias cdgit='cd ~/git/'
 alias colourify='/usr/local/bin/grc -es --colour=auto'
+alias configure='colourify ./configure'
 alias df='colourify df'
 alias diff='colourify diff'
 alias dig='colourify dig'
 alias dus='df -h'
 alias editprofile='vi ~/.bash_profile'
 alias egrep='egrep --color=auto'
-alias elasticsearchx='elasticsearch --config=/usr/local/opt/elasticsearch/config/elasticsearch.yml'
+alias elasticsearchx='elasticsearch --config="/usr/local/opt/elasticsearch/config/elasticsearch.yml"'
 alias fgrep='fgrep --color=auto'
 alias finder_s='defaults write com.apple.Finder AppleShowAllFiles TRUE; killAll Finder'
 alias flushDNS='dscacheutil -flushcache'
@@ -29,9 +28,9 @@ alias g++='colourify g++'
 alias gas='colourify gas'
 alias gcc='colourify gcc'
 alias get='wget -q -O-'
-alias gg='go get -u'
 alias godev='~/git/GOLANG/bin/go'
 alias godevfmt='~/git/GOLANG/bin/gofmt'
+alias gg='go get -u -t'
 alias grep='grep --color=auto'
 alias head='colourify head'
 alias header='curl -I'
@@ -40,8 +39,8 @@ alias kvml='source /usr/local/bin/kvm.sh'
 alias l.='ls -d .* --color=auto'
 alias ld='colourify ld'
 alias ll='ls -al'
-alias localip='ifconfig en0 inet | grep '\''inet '\'' | awk '\'' { print  } '\'''
-alias lr='ls -R | grep ":$" | sed -e '\''s/:$//'\'' -e '\''s/[^-][^\/]*\//--/g'\'' -e '\''s/^/   /'\'' -e '\''s/-/|/'\'' | less'
+alias localip='ifconfig en0 inet | grep "inet " | awk " { print  } "'
+alias lr='ls -R | grep ":$" | sed -e "s/:$//" -e "s/[^-][^\/]*\//--/g" -e "s/^/   /" -e "s/-/|/" | less'
 alias make='colourify make'
 alias makemine='sudo chown simonwaldherr'
 alias mount='colourify mount'
@@ -67,7 +66,7 @@ alias sudolast='sudo !!'
 alias swift='xcrun swift'
 alias tail='colourify tail'
 alias traceroute='colourify /usr/sbin/traceroute'
-alias trim='sed -e '\''s/^[[:space:]]*//g'\'' -e '\''s/[[:space:]]*$//g'\'''
+alias trim='sed -e "s/^[[:space:]]*//g" -e "s/[[:space:]]*$//g"'
 alias x='exit'
 alias pe='path-extractor'
 
@@ -76,11 +75,11 @@ appsdupp () {
 }
 
 mostused () {
-  history | sed 's/bu/brew update/' | sed 's/hgrep/history|grep/' | sed 's/godev/go/' | sed 's/rls/find/' | sed 's/gg/go get/' | sed 's/^ +//' | tr "|" "\n" | awk '{CMD[$1]++;count++;}END { for (a in CMD)print CMD[a] " " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl |  head -n50
+  history | trim | sed 's/bu/brew update/' | sed 's/hgrep/history|grep/' | sed 's/godev/go/' | sed 's/rls/find/' | sed 's/gg/go get/' | sed 's/"//' | sed 's/fping/ping/' | sed 's/apps/echo | tr | xargs /' | sed 's/sudo /sudo | /' | sed 's/xargs /xargs | /' | sed 's/^ +//' | tr "|" "\n" | trim | awk '{CMD[$1]++;count++;}END { for (a in CMD)print CMD[a] " " a;}' | grep -v "./" | egrep --invert-match "^[0-9]+ .?$" | column -c3 -s " " -t | sort -nr | nl |  head -n50
 }
 
 hgrep () { 
-  history | tail -r | sed -e 's/^[0-9 \t]*//' | awk '!a[$0]++' | tail -r | grep "$1" 
+  history | tail -r | sed -e 's/^[0-9 ]*//' | awk '!a[$0]++' | tail -r | grep "$1" 
 }
 
 mkacd () { 
@@ -96,7 +95,11 @@ sman () {
 }
 
 jssize () { 
-  uglifyjs "$1" | gzip -9f | wc -c 
+  uglifyjs | gzip -9f | wc -c 
+}
+
+listTCP () {
+  lsof -i | grep " TCP " | sed -E "s/^([^ ]+).+(\([A-Z_]+\))$/\1 \2/" | awk '!a[$0]++'
 }
 
 dash () { 
@@ -122,7 +125,7 @@ pman () {
 supdate () {
   softwareupdate -i -a &
   bgp1=$!
-  bu &
+  brew update && brew upgrade --all && brew cleanup &
   bgp2=$!
   wait $bgp1
   wait $bgp2
@@ -144,9 +147,11 @@ savebashprofile () {
   brew list --versions > ~/git/Todo/osx_settings/brew_list.log
   rm /Applications/.DS_Store
   ls -al /Applications/ > ~/git/Todo/osx_settings/applications.log
+  tlmgr info --only-installed > ~/git/Todo/osx_settings/tex_installed.log
   pkgutil --packages > ~/git/Todo/osx_settings/pkgutil.log
+  cpan -l > ~/git/Todo/osx_settings/cpan.log
   history >> ~/git/Todo/osx_settings/history.log
-  cat ~/git/Todo/osx_settings/history.log | tail -r | sed -e 's/^[0-9 \t]*//' | awk '!a[$0]++' | tail -r > ~/git/Todo/osx_settings/history.log.tmp
+  cat ~/git/Todo/osx_settings/history.log | tail -r | sed -e 's/^[0-9 ]*//' | awk '!a[$0]++' | tail -r > ~/git/Todo/osx_settings/history.log.tmp
   mv ~/git/Todo/osx_settings/history.log.tmp ~/git/Todo/osx_settings/history.log
   npm list -g > ~/git/Todo/osx_settings/npm_list.log
   ls -al /usr/local/bin/ > ~/git/Todo/osx_settings/bin.log
@@ -154,8 +159,9 @@ savebashprofile () {
   ls -al ~/Golang/bin >> ~/git/Todo/osx_settings/bin.log
   ls -al ~/git/GOLANG/bin >> ~/git/Todo/osx_settings/bin.log
   rls ~/Golang/src 3 ld > ~/git/Todo/osx_settings/gosrc.log
-  cat ~/git/Todo/osx_settings/history.log | grep "go get " > ~/git/Todo/osx_settings/goget.log
-  cat ~/git/Todo/osx_settings/history.log | grep "gg " >> ~/git/Todo/osx_settings/goget.log
+  cat ~/git/Todo/osx_settings/history.log | grep "^go get " > ~/git/Todo/osx_settings/goget.log
+  cat ~/git/Todo/osx_settings/history.log | grep "^gg " >> ~/git/Todo/osx_settings/goget.log
+  Rscript ~/git/Todo/osx_settings/Rpackages.r
   mostused > ~/git/Todo/osx_settings/mostused.log
   apps > ~/git/Todo/osx_settings/apps.log
   alias > ~/git/Todo/osx_settings/alias.log
@@ -351,6 +357,7 @@ if [ -f $(brew --prefix)/etc/bash_completion ]; then
   . $(brew --prefix)/etc/bash_completion
 fi
 
+export GO15VENDOREXPERIMENT=1
 export GOPATH="/Users/simonwaldherr/Golang"
 export PATH=$PATH:/usr/local/opt/go/libexec/bin:$GOPATH/bin:/Users/simonwaldherr/git/GOLANG/bin
 export CLICOLOR=1
@@ -361,6 +368,7 @@ export HISTCONTROL="ignoreboth"
 export LS_OPTIONS='--color=auto'
 export NVM_DIR=~/.nvm
 export DYLD_LIBRARY_PATH=$PWD/libgit2/install/lib
+export SHELL_SESSION_HISTORY=1
 
 shopt -s histappend
 source "`brew --prefix`/etc/grc.bashrc"
