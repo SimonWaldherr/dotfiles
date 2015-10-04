@@ -70,12 +70,29 @@ alias trim='sed -e "s/^[[:space:]]*//g" -e "s/[[:space:]]*$//g"'
 alias x='exit'
 alias pe='path-extractor'
 
+kotlin () {
+  if [ "$1" == "build" ]; then
+    kotlinc-jvm $2 -include-runtime -d $2.jar
+  else
+    kotlin build $2
+    java -jar $2.jar
+    rm $2.jar
+  fi
+}
+
 appsdupp () {
   apps | awk '{CMD[$1]++;count++;}END { for (a in CMD)print CMD[a] " " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl | grep -v "1   "
 }
 
 mostused () {
   history | trim | sed 's/bu/brew update/' | sed 's/hgrep/history|grep/' | sed 's/godev/go/' | sed 's/rls/find/' | sed 's/gg/go get/' | sed 's/"//' | sed 's/fping/ping/' | sed 's/apps/echo | tr | xargs /' | sed 's/sudo /sudo | /' | sed 's/xargs /xargs | /' | sed 's/^ +//' | tr "|" "\n" | trim | awk '{CMD[$1]++;count++;}END { for (a in CMD)print CMD[a] " " a;}' | grep -v "./" | egrep --invert-match "^[0-9]+ .?$" | column -c3 -s " " -t | sort -nr | nl |  head -n50
+}
+
+gomultitest () {
+  env GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 /Users/simonwaldherr/git/GOLANG/bin/go test $1
+  env GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 /Users/simonwaldherr/git/GOLANG/bin/go test $1
+  env GOOS=darwin GOARCH=386 CGO_ENABLED=0 /Users/simonwaldherr/git/GOLANG/bin/go test $1
+  env GOOS=darwin GOARCH=386 CGO_ENABLED=1 /Users/simonwaldherr/git/GOLANG/bin/go test $1
 }
 
 hgrep () { 
@@ -359,10 +376,11 @@ fi
 
 export GO15VENDOREXPERIMENT=1
 export GOPATH="/Users/simonwaldherr/Golang"
-export PATH=$PATH:/usr/local/opt/go/libexec/bin:$GOPATH/bin:/Users/simonwaldherr/git/GOLANG/bin
+export PATH=$PATH:/usr/local/opt/go/libexec/bin:$GOPATH/bin:/Users/simonwaldherr/git/GOLANG/bin:/Users/simonwaldherr/bin
 export CLICOLOR=1
 export LSCOLORS=dxfxcxdxbxegedabagacad
-export HISTSIZE=900000
+export HISTSIZE=
+export HISTFILESIZE=
 export PATH=/usr/local/bin:$PATH
 export HISTCONTROL="ignoreboth"
 export LS_OPTIONS='--color=auto'
@@ -400,4 +418,5 @@ fi
 export PATH=/usr/local/sbin:$PATH
 export GOROOT_BOOTSTRAP=/usr/local/Cellar/go/1.4.2/libexec
 
-
+archey
+export PATH=$PATH:"${pwd}"
